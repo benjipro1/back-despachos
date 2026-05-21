@@ -39,21 +39,22 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/back-despachos:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/back-despachos:${{ github.sha }}
 
-      - name: Deploy en EC2
+      - name: Deploy en EC2 Backend
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.EC2_FRONTEND_HOST }}
+          host: ${{ secrets.EC2_BACKEND_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          proxy_host: ${{ secrets.EC2_FRONTEND_HOST }}
+          proxy_username: ${{ secrets.EC2_USERNAME }}
+          proxy_key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_BACKEND_HOST }} "
-              cd ~/app/backend
-              echo DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} > .env
-              echo DB_NAME=${{ secrets.DB_NAME }} >> .env
-              echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
-              echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
-              echo MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} >> .env
-              docker compose pull backend
-              docker compose up -d --force-recreate backend
-              docker image prune -f
-            "
+            cd ~/app/backend
+            echo DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} > .env
+            echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+            echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
+            echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+            echo MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} >> .env
+            docker compose pull backend
+            docker compose up -d --force-recreate backend
+            docker image prune -f
