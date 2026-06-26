@@ -1,4 +1,4 @@
-﻿name: CI/CD Backend - Despachos (ECS Fargate)
+name: CI/CD Backend - Despachos (ECS Fargate)
 
 on:
   push:
@@ -28,8 +28,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Ejecutar tests unitarios
-        run: mvn test -B
+      - name: Ejecutar tests unitarios (excluye contextLoads, requiere DB real inalcanzable desde el runner)
+        run: mvn test -Dtest='!*ApplicationTests' -DfailIfNoTests=false -B
 
       - name: Build con Maven (sin tests, ya se ejecutaron arriba)
         run: mvn clean package -DskipTests -B
